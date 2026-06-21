@@ -8,10 +8,17 @@ from src.config import Config
 class MomentumBTStrategy(bt.Strategy):
     """Backtrader strategy wrapper for momentum trading."""
 
+    params = (
+        ('sma_fast', 10),
+        ('sma_slow', 30),
+        ('tp_pct', 0.03),
+        ('sl_pct', 0.02),
+    )
+
     def __init__(self):
         # Simple moving averages for trend
-        self.sma_fast = bt.indicators.SMA(self.data.close, period=10)
-        self.sma_slow = bt.indicators.SMA(self.data.close, period=30)
+        self.sma_fast = bt.indicators.SMA(self.data.close, period=self.params.sma_fast)
+        self.sma_slow = bt.indicators.SMA(self.data.close, period=self.params.sma_slow)
 
         # Crossover signal
         self.crossover = bt.indicators.CrossOver(self.sma_fast, self.sma_slow)
@@ -29,11 +36,11 @@ class MomentumBTStrategy(bt.Strategy):
             current_price = self.data.close[0]
             entry_price = self.position.price
 
-            # Take profit at +3%
-            if current_price >= entry_price * 1.03:
+            # Take profit at configured level
+            if current_price >= entry_price * (1 + self.params.tp_pct):
                 self.sell()
-            # Stop loss at -2%
-            elif current_price <= entry_price * 0.98:
+            # Stop loss at configured level
+            elif current_price <= entry_price * (1 - self.params.sl_pct):
                 self.sell()
             # Death cross: Fast SMA crosses below Slow SMA (bearish)
             elif self.crossover < 0:
@@ -93,8 +100,15 @@ class Backtester:
             print("\n❌ No data loaded. Check internet connection or symbols.")
             return self._empty_metrics()
 
-        # Add strategy and analyzers
-        cerebro.addstrategy(MomentumBTStrategy)
+        # Add strategy with optimized parameters
+        # resistance_period maps to sma_fast, and we use 40 for sma_slow (best from optimization)
+        cerebro.addstrategy(
+            MomentumBTStrategy,
+            sma_fast=15,  # Optimized SMA fast period
+            sma_slow=40,  # Optimized SMA slow period
+            tp_pct=0.06,  # Optimized take profit
+            sl_pct=0.03,  # Optimized stop loss
+        )
         cerebro.broker.setcash(self.config.backtest.initial_cash)
         cerebro.broker.setcommission(commission=0.001)
 
