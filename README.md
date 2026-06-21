@@ -29,6 +29,19 @@ Copy `config/secrets.example.json` to `config/secrets.json` and add your credent
 
 ## Usage
 
+### Optimize Strategy Parameters
+
+**Quick optimization (10 combinations):**
+```bash
+python optimize.py
+```
+
+**Comprehensive optimization (1000 combinations + stability testing):**
+```bash
+python optimize_1000.py
+```
+This tests 1000 parameter combinations and runs the best strategy 10 times across different time periods to verify stability. Runtime: ~5 minutes.
+
 ### Backtesting
 
 Validate strategies on historical data:
@@ -60,34 +73,62 @@ python main.py --mode live
 - **Execution** (`src/execution/`): Backtesting, paper trading, and live execution
 - **Risk** (`src/risk/`): Position sizing and portfolio risk management
 - **Monitoring** (`src/monitoring/`): Trade logging and terminal dashboard
+- **Optimization** (`src/execution/optimizer.py`): Parameter search and backtesting engine
 
 ## Configuration
 
 Edit `config/config.json` to control:
 
-- Strategy parameters (entry/exit logic, hold times)
+- Strategy parameters (SMA periods, entry/exit logic, hold times)
 - Risk settings (position sizes, daily loss limits, drawdown limits)
 - Watchlist (symbols to trade)
 - Backtest dates and initial capital
 
+## Strategy Parameters
+
+The strategy uses Golden Cross (SMA crossover) momentum trading:
+
+- **SMA Fast Period**: Fast-moving simple average (detects trends quickly)
+- **SMA Slow Period**: Slow-moving simple average (confirms trend)
+- **Take Profit %**: Exit profit target (e.g., 6% = sell at +6% gain)
+- **Stop Loss %**: Exit loss limit (e.g., 3% = sell at -3% loss)
+
+### Example Configuration
+
+```json
+"momentum": {
+  "resistance_period": 15,
+  "stop_loss_pct": 0.03,
+  "take_profit_target_1": 0.06,
+  "take_profit_target_2": 0.06
+}
+```
+
+## Parameter Optimization
+
+The bot includes two optimization scripts:
+
+1. **optimize.py** - Tests 10 parameter combinations
+   - Fast execution (~30 seconds)
+   - Good for quick validation
+
+2. **optimize_1000.py** - Tests 1000 parameter combinations
+   - Comprehensive search (~5 minutes)
+   - Tests broader parameter ranges
+   - Runs best strategy 10 times on different time windows
+   - Reports average performance and stability
+
+**Search Space (optimize_1000.py):**
+- SMA Fast: 5-20
+- SMA Slow: 25-60
+- Take Profit: 2%-10%
+- Stop Loss: 1%-4%
+
 ## Trading Timeline
 
-- **Week 1:** Backtesting phase (validate strategy on 2+ years of data)
+- **Week 1:** Parameter optimization + backtesting
 - **Week 2:** Paper trading phase (live market data, simulated execution)
 - **Week 3+:** Live trading with $1000 starting capital
-
-## Strategies
-
-### Momentum Trading
-- Entry: Stock breaks above 20-day resistance + volume spike ≥20%
-- Exit: Stop loss -2.3%, Take profit +5% (50%) and +10% (50%), or 6-hour timeout
-- Risk: 1-2% per trade
-
-### Options Spreads
-- Strategy: Bull/bear call spreads on IV expansion
-- IV Threshold: >70th percentile
-- Risk: Up to 4% per trade
-- Hold: 1-2 weeks to expiration
 
 ## Testing
 
@@ -99,7 +140,7 @@ pytest tests/ -v
 
 ## Disclaimer
 
-This bot uses real capital when in live mode. **Trade at your own risk.** Always validate strategies thoroughly in backtesting and paper trading before going live. Losses are possible.
+This bot uses real capital when in live mode. **Trade at your own risk.** Always validate strategies thoroughly in optimization, backtesting, and paper trading before going live. Losses are possible.
 
 ## Project Structure
 
@@ -117,6 +158,8 @@ opentrader/
 │   ├── config.json          # Strategy & risk params
 │   └── secrets.example.json # Credentials template
 ├── tests/                   # Test suite
+├── optimize.py              # Quick optimization (10 combos)
+├── optimize_1000.py         # Full optimization (1000 combos)
 ├── main.py                  # CLI entry point
 ├── requirements.txt         # Python dependencies
 ├── .gitignore
@@ -125,9 +168,9 @@ opentrader/
 
 ## Next Steps
 
-1. Run backtesting to validate strategies
-2. Switch to paper trading for 1 week
-3. Deploy to live trading with initial $1000 capital
-4. Monitor performance and iterate
+1. Run `python optimize_1000.py` to find optimal strategy
+2. Review results and stability metrics
+3. Test in paper trading mode for 1 week
+4. Deploy to live trading if profitable
 
 Happy trading! 📈
