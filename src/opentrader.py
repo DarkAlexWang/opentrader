@@ -21,12 +21,15 @@ class OpenTrader:
 
     def run_backtest(self) -> dict:
         """Run backtesting mode."""
-        print("Starting backtesting...")
-        print(f"Backtest period: {self.config.backtest.start_date} to {self.config.backtest.end_date}")
-        print(f"Initial capital: ${self.config.backtest.initial_cash}")
-        print(f"Strategy: Momentum + Options Spreads")
-        print("\nBacktest mode not fully implemented in phase 1.")
-        return {}
+        from src.execution.backtester import Backtester
+
+        backtester = Backtester(self.config)
+        metrics = backtester.run_backtest(
+            self.config.watchlist,
+            self.config.backtest.start_date,
+            self.config.backtest.end_date,
+        )
+        return metrics
 
     def run_paper_trading(self) -> None:
         """Run paper trading mode."""
