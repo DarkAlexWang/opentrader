@@ -9,35 +9,35 @@ class MomentumBTStrategy(bt.Strategy):
     """Backtrader strategy wrapper for momentum trading."""
 
     def __init__(self):
-        self.indicators = Indicators()
-        self.trades_count = 0
-        self.wins = 0
-        self.losses = 0
+        # Simple moving averages for trend
+        self.sma_fast = bt.indicators.SMA(self.data.close, period=10)
+        self.sma_slow = bt.indicators.SMA(self.data.close, period=30)
+
+        # Crossover signal
+        self.crossover = bt.indicators.CrossOver(self.sma_fast, self.sma_slow)
 
     def next(self):
-        """Called on each bar."""
+        """Called on each bar - simple golden cross strategy."""
         if not self.position:
-            # Entry logic: simple breakout on close > 20-day high
-            if len(self) >= 20:
-                high_20 = max(self.data.high.get(size=20))
-                if self.data.close[0] > high_20 * 0.99:  # Entry at recent high
-                    self.buy(size=10)
+            # Entry: Fast SMA crosses above Slow SMA (bullish)
+            if self.crossover > 0:  # Golden cross
+                size = int(self.broker.getcash() * 0.95 / self.data.close[0])
+                if size > 0:
+                    self.buy(size=size)
         else:
-            # Exit logic
-            entry_price = self.position.barlen[0] if hasattr(self.position, 'barlen') else self.data.close[0]
+            # Exit conditions
             current_price = self.data.close[0]
+            entry_price = self.position.price
 
-            # Stop loss: 2.5% below entry
-            stop_loss = entry_price * 0.975
-            if current_price <= stop_loss:
+            # Take profit at +3%
+            if current_price >= entry_price * 1.03:
                 self.sell()
-                self.losses += 1
-                self.trades_count += 1
-            # Take profit: +5%
-            elif current_price >= entry_price * 1.05:
+            # Stop loss at -2%
+            elif current_price <= entry_price * 0.98:
                 self.sell()
-                self.wins += 1
-                self.trades_count += 1
+            # Death cross: Fast SMA crosses below Slow SMA (bearish)
+            elif self.crossover < 0:
+                self.sell()
 
 
 class Backtester:
