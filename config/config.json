@@ -1,0 +1,40 @@
+{
+  "strategy": {
+    "momentum": {
+      "enabled": true,
+      "resistance_period": 20,
+      "volume_spike_threshold": 1.2,
+      "stop_loss_pct": 0.025,
+      "take_profit_target_1": 0.05,
+      "take_profit_target_2": 0.10,
+      "max_hold_hours": 6
+    },
+    "options": {
+      "enabled": true,
+      "iv_percentile_threshold": 70,
+      "spread_width": 5,
+      "days_to_expiration_min": 7,
+      "days_to_expiration_max": 21,
+      "target_delta": 0.40
+    }
+  },
+  "risk": {
+    "stock_risk_pct": 0.02,
+    "options_risk_pct": 0.04,
+    "max_concurrent_positions": 5,
+    "daily_loss_limit_pct": 0.05,
+    "max_drawdown_pct": 0.10
+  },
+  "broker": {
+    "type": "robinhood",
+    "trading_hours_start": "09:30",
+    "trading_hours_end": "16:00",
+    "timezone": "US/Eastern"
+  },
+  "watchlist": ["AAPL", "MSFT", "NVDA", "TSLA", "SPY", "QQQ", "AMD", "GOOGL"],
+  "backtest": {
+    "start_date": "2022-01-01",
+    "end_date": "2024-06-20",
+    "initial_cash": 1000
+  }
+}
