@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.opentrader.papertrading</string>
+
+	<key>ProgramArguments</key>
+	<array>
+		<string>/bin/bash</string>
+		<string>/Users/alex/Projects/opentrader/run_paper_trading.sh</string>
+	</array>
+
+	<key>StartCalendarInterval</key>
+	<array>
+		<!-- Monday 9:30 AM EST -->
+		<dict>
+			<key>Minute</key>
+			<integer>30</integer>
+			<key>Hour</key>
+			<integer>14</integer>
+			<key>Weekday</key>
+			<integer>1</integer>
+		</dict>
+		<!-- Tuesday 9:30 AM EST -->
+		<dict>
+			<key>Minute</key>
+			<integer>30</integer>
+			<key>Hour</key>
+			<integer>14</integer>
+			<key>Weekday</key>
+			<integer>2</integer>
+		</dict>
+		<!-- Wednesday 9:30 AM EST -->
+		<dict>
+			<key>Minute</key>
+			<integer>30</integer>
+			<key>Hour</key>
+			<integer>14</integer>
+			<key>Weekday</key>
+			<integer>3</integer>
+		</dict>
+		<!-- Thursday 9:30 AM EST -->
+		<dict>
+			<key>Minute</key>
+			<integer>30</integer>
+			<key>Hour</key>
+			<integer>14</integer>
+			<key>Weekday</key>
+			<integer>4</integer>
+		</dict>
+		<!-- Friday 9:30 AM EST -->
+		<dict>
+			<key>Minute</key>
+			<integer>30</integer>
+			<key>Hour</key>
+			<integer>14</integer>
+			<key>Weekday</key>
+			<integer>5</integer>
+		</dict>
+	</array>
+
+	<key>StandardOutPath</key>
+	<string>/Users/alex/Projects/opentrader/logs/launchd.log</string>
+
+	<key>StandardErrorPath</key>
+	<string>/Users/alex/Projects/opentrader/logs/launchd_error.log</string>
+
+	<key>WorkingDirectory</key>
+	<string>/Users/alex/Projects/opentrader</string>
+</dict>
+</plist>
